@@ -4,6 +4,7 @@ Architecture is based on Docker services: Wordpress, MySQL DB and NGINX web serv
 
 ## Setup
 ### Directory structure
+```
 ├── README.md
 ├── docker-compose.yml
 └── nginx
@@ -11,6 +12,7 @@ Architecture is based on Docker services: Wordpress, MySQL DB and NGINX web serv
     └── ssl
         ├── fullchain.pem
         └── privkey.pem
+```
 
 ### Creating the SSL certificate
 Run this if the directory does not exists:
