@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  wordpress_advacor:
+    image: wordpress:latest
+    container_name: wordpress_advacor
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db_advacor
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress_advacor
+    volumes:
+      - wordpress_advacor_data:/var/www/html
+    networks:
+      - actappon_wordpress_network
+
+  db_advacor:
+    image: mysql:5.7
+    container_name: mysql_advacor
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordpress_advacor
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - db_advacor_data:/var/lib/mysql
+    networks:
+      - actappon_wordpress_network
+
+volumes:
+  wordpress_advacor_data:
+  db_advacor_data:
+
+networks:
+  actappon_wordpress_network:
+    external: true
+
