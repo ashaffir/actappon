@@ -12,6 +12,7 @@ services:
       WORDPRESS_DB_NAME: wordpress_advacor
     volumes:
       - wordpress_advacor_data:/var/www/html
+      - ./custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini
     networks:
       - actappon_wordpress_network
 

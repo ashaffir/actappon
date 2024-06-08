@@ -17,5 +17,5 @@ find $BACKUP_DIR -type f -name '*.tar.gz' -mtime +30 -exec rm {} \;
 
 # Setup crontab
 # crontab -e
-# 0 0 * * * /home/alfreds/actappon/backup.sh
+# 0 0 * * * /home/alfreds/actappon/backup.sh > /home/alfreds/actappon/backup.log 2>&1
 
