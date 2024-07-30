@@ -12,8 +12,8 @@ for VOLUME in $VOLUME_NAMES; do
 done
 
 
-# Optional: Remove old backups older than 30 days
-find $BACKUP_DIR -type f -name '*.tar.gz' -mtime +30 -exec rm {} \;
+# Optional: Remove old backups older than 3 days
+find $BACKUP_DIR -type f -name '*.tar.gz' -mtime +2 -exec rm {} \;
 
 # Setup crontab
 # crontab -e
