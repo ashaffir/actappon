@@ -36,17 +36,29 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./nginx/ssl:/etc/nginx/ssl
-      - static_volume:/static 
       - ./nginx/logs:/var/log/nginx
+      - webroot:/var/www/certbot
+      - static_volume:/static
     ports:
       - "80:80"
       - "443:443"
     networks:
       - wordpress_network
 
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
+      - webroot:/var/www/certbot 
+      - ./certbot-renew.sh:/certbot-renew.sh
+    entrypoint: /certbot-renew.sh
+
 volumes:
   wordpress_data:
   db_data:
+  webroot:
   static_volume:
     external: true
 
