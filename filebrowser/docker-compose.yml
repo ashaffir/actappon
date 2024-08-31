@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  filebrowser:
+    image: filebrowser/filebrowser
+    container_name: filebrowser
+    expose:
+      - 8090
+    networks:
+      - external_network
+    volumes:
+      - /home/alfreds/:/srv
+      - /home/alfreds/actappon/filebrowser/database/filebrowser.db:/database/filebrowser.db  
+      - /home/alfreds/actappon/filebrowser/config/settings.json:/config/settings.json  
+    environment:
+      - PUID=1000
+      - PGID=1000
+    restart: unless-stopped
+
+networks:
+  external_network:
+    external:
+      name: actappon_wordpress_network
