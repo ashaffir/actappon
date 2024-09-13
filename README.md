@@ -9,22 +9,24 @@ Architecture is based on Docker services: Wordpress, MySQL DB and NGINX web serv
 ├── docker-compose.yml
 └── nginx
     ├── default.conf
-    └── ssl
-        ├── fullchain.pem
-        └── privkey.pem
 ```
 
 ### Creating the SSL certificate
-Run this if the directory does not exists:
-mkdir -p /var/www/html/
+1. Modify the default.conf file (for the Nginx), not to include the pem files (remove the secured server section)
+2. Start the docker-compose with all that is inside
+3. From inside the certbot docker run:
 
-* Make sure to have a simple index.html file inside.
+certbot certonly --webroot --webroot-path=/var/www/certbot --email alfreds@actappon.com --agree-tos --no-eff-email -d actappon.com --debug
 
-Run:
-sudo certbot certonly --webroot -w /var/www/html -d actappon.com
+* For multiple subdomains
+1. Use the monolitic structure in this repo for the nginx conf
+2. Run (from the certbot docker)
+```certbot certonly --manual --preferred-challenges=dns --email alfreds@actappon.com --agree-tos --no-eff-email -d *.actappon.com```
 
-sudo cp /etc/letsencrypt/live/actappon.com/fullchain.pem ./nginx/ssl/
-sudo cp /etc/letsencrypt/live/actappon.com/privkey.pem ./nginx/ssl/
+- When promped to add the challenge to the DNS TXT make sure to are the ```_acme-challenge``` only in the TXT DNS (without the .actappon.com)
+- Make sure to check that the new TXT entry was propagated using: https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.actappon.com
+
+3. The pem file created are only for the subdomains.
 
 ### Install docker and docker-compose 
 

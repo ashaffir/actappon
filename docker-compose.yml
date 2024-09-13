@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   wordpress:
@@ -34,12 +34,10 @@ services:
     container_name: nginx
     restart: always
     volumes:
-      - ./nginx:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/default.conf:/etc/nginx/nginx.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
       - ./nginx/logs:/var/log/nginx
-      - /etc/letsencrypt:/etc/letsencrypt
-      - /var/lib/letsencrypt:/var/lib/letsencrypt
-      - webroot:/var/www/certbot
       - static_volume:/static
     ports:
       - "80:80"
@@ -51,11 +49,11 @@ services:
     image: certbot/certbot:latest
     container_name: certbot
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-      - /var/lib/letsencrypt:/var/lib/letsencrypt
-      - webroot:/var/www/certbot 
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
       - ./certbot-renew.sh:/certbot-renew.sh
-    entrypoint: /certbot-renew.sh
+#    entrypoint: /certbot-renew.sh
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew; done;'"
     networks:
       - wordpress_network
 
