@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  monitor:
+    image: louislam/uptime-kuma:1
+    container_name: monitor
+    restart: always
+    expose:
+      - 3001
+    volumes:
+      - uptime-kuma:/app/data
+    networks:
+      - actappon_wordpress_network
+
+volumes:
+  uptime-kuma:
+
+networks:
+  actappon_wordpress_network:
+    external: true
+
