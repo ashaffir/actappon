@@ -28,6 +28,13 @@ certbot certonly --webroot --webroot-path=/var/www/certbot --email alfreds@actap
 
 3. The pem file created are only for the subdomains.
 
+4. Delete the previous actappon.com-0001 directory from the certbot/conf/archive and delete the new one that was created at /etc/letsencrypt/archive/actappon.com-0001
+* Notice, the files are in the "archive" directory, not in the live (where they are linking to the archive
+
+
+either directly to the certbot/conf/live/
+
+
 ### Install docker and docker-compose 
 
 ### Run the docker compose
