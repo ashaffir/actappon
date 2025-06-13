@@ -41,4 +41,12 @@ either directly to the certbot/conf/live/
 docker-compose up -d
 
 
+### Credentials to the monitor.actappon.com
+alfreds
+6 hop A+
+
+### Credentials to the filebrowser.actappon.com
+admin
+6 hop A+
+
 
