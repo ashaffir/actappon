@@ -1,0 +1,49 @@
+services:
+
+  wordpress:
+    container_name: wordpress_shamaut
+    depends_on:
+      db:
+        condition: service_healthy  # Ensures WordPress waits for MySQL to be ready
+    image: wordpress:latest
+    networks:
+      - actappon_wordpress_network
+    ports:
+      - "10.100.102.120:30303:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: shamaut_user
+      WORDPRESS_DB_PASSWORD: shamaut_db_password
+      WORDPRESS_DB_NAME: shamaut_wp
+    volumes:
+      - wordpress_data:/var/www/html
+      - ./custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini
+
+  db:
+    container_name: db_shamaut
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - actappon_wordpress_network
+    restart: always
+    command: --max_connections=200 --wait_timeout=28800 --interactive_timeout=28800
+    environment:
+      MYSQL_ROOT_PASSWORD: shamaut_root_password
+      MYSQL_DATABASE: shamaut_wp
+      MYSQL_USER: shamaut_user
+      MYSQL_PASSWORD: shamaut_db_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+
+volumes:
+  db_data:
+  wordpress_data:
+
+networks:
+  actappon_wordpress_network:
+    external: true
+
