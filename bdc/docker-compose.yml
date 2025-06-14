@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  bdc:
+    image: wordpress:latest
+    container_name: bdc
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: bdc_db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: bdc_wordpress
+    volumes:
+      - bdc_data:/var/www/html
+      - ./custom-php.ini:/usr/local/etc/php/conf.d/custom-php.ini
+    networks:
+      - actappon_wordpress_network
+
+  bdc_db:
+    image: mysql:5.7
+    container_name: mysql_bdc
+    restart: always
+    environment:
+      MYSQL_DATABASE: bdc_db
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - db_bdc_data:/var/lib/mysql
+    networks:
+      - actappon_wordpress_network
+
+volumes:
+  bdc_data:
+  db_bdc_data:
+
+networks:
+  actappon_wordpress_network:
+    external: true
+
