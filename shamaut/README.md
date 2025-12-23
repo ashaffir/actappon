@@ -1,3 +1,0 @@
-# Adi's Shamaut webiste
-
-

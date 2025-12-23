@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   monitor:
     image: louislam/uptime-kuma:1

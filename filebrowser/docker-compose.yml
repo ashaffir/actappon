@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   filebrowser:
     image: filebrowser/filebrowser
@@ -10,8 +8,8 @@ services:
       - external_network
     volumes:
       - /home/alfreds/:/srv
-      - /home/alfreds/actappon/filebrowser/database/filebrowser.db:/database/filebrowser.db  
-      - /home/alfreds/actappon/filebrowser/config/settings.json:/config/settings.json  
+      - /home/alfreds/proj/actappon/filebrowser/database/filebrowser.db:/database/filebrowser.db  
+      - /home/alfreds/proj/actappon/filebrowser/config/settings.json:/config/settings.json  
     environment:
       - PUID=1000
       - PGID=1000

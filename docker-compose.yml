@@ -63,7 +63,6 @@ volumes:
   db_data:
   webroot:
   static_volume:
-    external: true
 
 networks:
   wordpress_network:
