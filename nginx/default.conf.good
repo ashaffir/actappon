@@ -22,8 +22,6 @@ http {
         listen 80;
         server_name actappon.com;
 
-        include /etc/nginx/cloudflare-allow.conf;
-
         location /.well-known/acme-challenge/ {
             root /var/www/certbot;
         }
@@ -36,8 +34,6 @@ http {
     server {
         listen 443 ssl;
         server_name actappon.com;
-
-        include /etc/nginx/cloudflare-allow.conf;
 
 	ssl_certificate /etc/letsencrypt/live/actappon.com/fullchain.pem;
     	ssl_certificate_key /etc/letsencrypt/live/actappon.com/privkey.pem;
@@ -59,13 +55,6 @@ http {
 	        proxy_read_timeout 120s;
 	        send_timeout 120s;
         }
-	
-	location = /xmlrpc.php {
-        	 deny all;
-	         access_log off;
-        	 log_not_found off;
-     	}
-
     }
 
     # Configuration for filebrowser.actappon.com
@@ -270,6 +259,165 @@ http {
 	    #auth_basic_user_file /etc/nginx/.htpasswd;
 	}
 
+	server {
+	    listen 80;
+	    server_name iocane.ai www.iocane.ai;
+
+	    location /.well-known/acme-challenge/ {
+		root /var/www/certbot;
+	    }
+
+	    location / {
+		return 301 https://$host$request_uri;
+	    }
+	}
+
+	server {
+	    listen 443 ssl;
+	    server_name iocane.ai www.iocane.ai;
+
+	    ssl_certificate /etc/letsencrypt/live/iocane.ai/fullchain.pem;
+	    ssl_certificate_key /etc/letsencrypt/live/iocane.ai/privkey.pem;
+
+	    ssl_protocols TLSv1.2 TLSv1.3;
+	    ssl_prefer_server_ciphers on;
+	    ssl_ciphers "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384";
+
+	    client_max_body_size 100M;
+
+	    location / {
+		proxy_pass http://website:3000;
+		
+		proxy_http_version 1.1;
+
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+
+		proxy_connect_timeout 60s;
+		proxy_send_timeout 60s;
+		proxy_read_timeout 120s;
+		send_timeout 120s;
+	    }
+	}
+
+	server {
+	    listen 80;
+	    server_name api.iocane.ai;
+
+	    location /.well-known/acme-challenge/ {
+		root /var/www/certbot;
+	    }
+
+	    location / {
+		return 301 https://$host$request_uri;
+	    }
+	}
+
+	server {
+	    listen 443 ssl;
+	    server_name api.iocane.ai;
+
+
+	    ssl_certificate /etc/letsencrypt/live/iocane.ai/fullchain.pem;
+	    ssl_certificate_key /etc/letsencrypt/live/iocane.ai/privkey.pem;
+
+	    ssl_protocols TLSv1.2 TLSv1.3;
+	    ssl_prefer_server_ciphers on;
+	    ssl_ciphers "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384";
+
+	    client_max_body_size 100M;
+
+
+	    # Route OTLP Traces to Collector
+	    location /v1/traces {
+		proxy_pass http://collector:8001;
+
+		proxy_http_version 1.1;
+
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+
+		proxy_connect_timeout 60s;
+		proxy_send_timeout 60s;
+		proxy_read_timeout 120s;
+		send_timeout 120s;
+	    }
+
+	    location / {
+		proxy_pass http://api:8000;
+
+		proxy_http_version 1.1;
+
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+
+		proxy_connect_timeout 60s;
+		proxy_send_timeout 60s;
+		proxy_read_timeout 120s;
+		send_timeout 120s;
+	    }
+	}
+
+	server {
+	    listen 80;
+	    server_name dashboard.iocane.ai;
+
+	    location /.well-known/acme-challenge/ {
+		root /var/www/certbot;
+	    }
+
+	    location / {
+		return 301 https://$host$request_uri;
+	    }
+	}
+
+	server {
+	    listen 443 ssl;
+	    server_name dashboard.iocane.ai;
+
+	    ssl_certificate /etc/letsencrypt/live/iocane.ai/fullchain.pem;
+	    ssl_certificate_key /etc/letsencrypt/live/iocane.ai/privkey.pem;
+
+	    ssl_protocols TLSv1.2 TLSv1.3;
+	    ssl_prefer_server_ciphers on;
+	    ssl_ciphers "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384";
+
+	    client_max_body_size 100M;
+
+	    location / {
+		proxy_pass http://dashboard:3000;
+
+		proxy_http_version 1.1;
+
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+
+		proxy_connect_timeout 60s;
+		proxy_send_timeout 60s;
+		proxy_read_timeout 120s;
+		send_timeout 120s;
+	    }
+	}
 
 }
 
