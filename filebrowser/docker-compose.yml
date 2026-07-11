@@ -3,13 +3,13 @@ services:
     image: filebrowser/filebrowser
     container_name: filebrowser
     expose:
-      - 8090
+      - 80
     networks:
       - external_network
     volumes:
-      - /home/alfreds/:/srv
-      - /home/alfreds/proj/actappon/filebrowser/database/filebrowser.db:/database/filebrowser.db  
-      - /home/alfreds/proj/actappon/filebrowser/config/settings.json:/config/settings.json  
+      - ${HOME}:/srv
+      - ./database/filebrowser.db:/database/filebrowser.db
+      - ./config/settings.json:/config/settings.json
     environment:
       - PUID=1000
       - PGID=1000
