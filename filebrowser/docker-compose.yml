@@ -17,5 +17,5 @@ services:
 
 networks:
   external_network:
-    external:
-      name: actappon_wordpress_network
+    name: actappon_wordpress_network
+    external: true
