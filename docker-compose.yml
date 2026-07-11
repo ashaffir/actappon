@@ -36,6 +36,7 @@ services:
       - ./nginx/default.conf:/etc/nginx/nginx.conf
       - ./nginx/cloudflare-allow.conf:/etc/nginx/cloudflare-allow.conf
       - ./nginx/cloudflare-real-ip.conf:/etc/nginx/cloudflare-real-ip.conf
+      - ./nginx/cloudflare-source-ip.conf:/etc/nginx/cloudflare-source-ip.conf
       - ./nginx/logs:/var/log/nginx
       - static_volume:/app/staticfiles
     ports:
@@ -53,4 +54,3 @@ networks:
   wordpress_network:
   shared_proxy:
     external: true
-
