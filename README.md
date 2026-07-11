@@ -11,34 +11,23 @@ Architecture is based on Docker services: Wordpress, MySQL DB and NGINX web serv
     ├── default.conf
 ```
 
-### Creating the SSL certificate
-1. Modify the default.conf file (for the Nginx), not to include the pem files (remove the secured server section)
-2. Start the docker-compose with all that is inside
-3. From inside the certbot docker run:
+### SSL with Cloudflare
+SSL is terminated by Cloudflare. The origin nginx container only listens on HTTP
+port 80, and Cloudflare proxies HTTPS traffic to the origin over HTTP.
 
-certbot certonly --webroot --webroot-path=/var/www/certbot --email alfreds@actappon.com --agree-tos --no-eff-email -d actappon.com --debug
+Recommended Cloudflare settings:
+- DNS records for `actappon.com`, `filebrowser.actappon.com`, and `monitor.actappon.com` should be proxied.
+- SSL/TLS mode should be `Flexible` for this HTTP-only origin setup.
+- Enable "Always Use HTTPS" in Cloudflare if HTTP-to-HTTPS redirects are needed.
 
-* For multiple subdomains
-1. Use the monolitic structure in this repo for the nginx conf
-2. Run (from the certbot docker)
-```certbot certonly --manual --preferred-challenges=dns --email alfreds@actappon.com --agree-tos --no-eff-email -d *.actappon.com```
-
-- When promped to add the challenge to the DNS TXT make sure to are the ```_acme-challenge``` only in the TXT DNS (without the .actappon.com)
-- Make sure to check that the new TXT entry was propagated using: https://toolbox.googleapps.com/apps/dig/#TXT/_acme-challenge.actappon.com
-
-3. The pem file created are only for the subdomains.
-
-4. Delete the previous actappon.com-0001 directory from the certbot/conf/archive and delete the new one that was created at /etc/letsencrypt/archive/actappon.com-0001
-* Notice, the files are in the "archive" directory, not in the live (where they are linking to the archive
-
-
-either directly to the certbot/conf/live/
+The nginx config restricts access to Cloudflare IP ranges and uses
+`CF-Connecting-IP` as the real client IP.
 
 
 ### Install docker and docker-compose 
 
 ### Run the docker compose
-docker-compose up -d
+./run.sh
 
 
 ### Credentials to the monitor.actappon.com
@@ -48,5 +37,4 @@ alfreds
 ### Credentials to the filebrowser.actappon.com
 admin
 6 hop A+
-
 

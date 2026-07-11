@@ -65,6 +65,6 @@ start_compose "Starting File Browser service" \
 start_compose "Starting monitor service" \
   docker-compose -f "$MONITOR_COMPOSE_FILE" up -d
 
-# Start the full Docker Compose setup, including nginx and certbot.
+# Start the full Docker Compose setup, including nginx.
 start_compose "Starting Docker Compose setup" \
   docker-compose up -d

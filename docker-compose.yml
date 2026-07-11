@@ -35,26 +35,11 @@ services:
     volumes:
       - ./nginx/default.conf:/etc/nginx/nginx.conf
       - ./nginx/cloudflare-allow.conf:/etc/nginx/cloudflare-allow.conf
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
+      - ./nginx/cloudflare-real-ip.conf:/etc/nginx/cloudflare-real-ip.conf
       - ./nginx/logs:/var/log/nginx
       - static_volume:/app/staticfiles
     ports:
       - "80:80"
-      - "443:443"
-    networks:
-      - wordpress_network
-      - shared_proxy
-
-  certbot:
-    image: certbot/certbot:latest
-    container_name: certbot
-    volumes:
-      - ./certbot/conf:/etc/letsencrypt
-      - ./certbot/www:/var/www/certbot
-      - ./certbot-renew.sh:/certbot-renew.sh
-#    entrypoint: /certbot-renew.sh
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew; done;'"
     networks:
       - wordpress_network
       - shared_proxy
@@ -62,12 +47,10 @@ services:
 volumes:
   wordpress_data:
   db_data:
-  webroot:
   static_volume:
 
 networks:
   wordpress_network:
   shared_proxy:
     external: true
-
 
