@@ -4,6 +4,7 @@ VOLUME_NAME="static_volume"
 NETWORK_NAME="shared_proxy"
 FILEBROWSER_COMPOSE_FILE="filebrowser/docker-compose.yml"
 MONITOR_COMPOSE_FILE="monitor/docker-compose.yml"
+MARKETING_AGENT_COMPOSE_FILE="marketing_agent/docker-compose.yml"
 BACKUPS_DIR="backups"
 
 start_compose() {
@@ -68,6 +69,9 @@ start_compose "Starting File Browser service" \
 start_compose "Starting monitor service" \
   docker-compose -f "$MONITOR_COMPOSE_FILE" up -d
 
+start_compose "Starting MSOA marketing agent service" \
+  docker-compose --project-directory marketing_agent -f "$MARKETING_AGENT_COMPOSE_FILE" up --build -d
+
 # Start the full Docker Compose setup, including nginx.
 start_compose "Starting Docker Compose setup" \
   docker-compose up -d
@@ -83,6 +87,7 @@ Post-run checklist:
      www.actappon.com
      filebrowser.actappon.com
      monitor.actappon.com
+     msoa.actappon.com
    - Make sure they are Proxied / orange-clouded.
 
 2. Cloudflare SSL/TLS
@@ -102,5 +107,7 @@ Post-run checklist:
    - docker ps
    - docker logs --tail=50 nginx
    - docker logs --tail=50 wordpress
+   - docker logs --tail=50 ui-frontend
+   - docker logs --tail=50 ui-backend
 
 EOF

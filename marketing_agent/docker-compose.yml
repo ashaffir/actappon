@@ -1,0 +1,152 @@
+services:
+  db:
+    container_name: msoa_db
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-msoa_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-msoa_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-msoa_db}
+    ports:
+      - "5532:5432"
+    volumes:
+      - msoa_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-msoa_user} -d ${POSTGRES_DB:-msoa_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-alfreds@actappon.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-!Q2w3e4r%T}
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+  collector:
+    container_name: collector
+    restart: always
+    build:
+      context: ./services/collector
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/collector:/app
+      - ./services/shared:/app/shared
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-msoa_user}:${POSTGRES_PASSWORD:-msoa_pass}@db:5432/${POSTGRES_DB:-msoa_db}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - REDDIT_CLIENT_ID=${REDDIT_CLIENT_ID}
+      - REDDIT_CLIENT_SECRET=${REDDIT_CLIENT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  pipeline:
+    container_name: pipeline
+    restart: always
+    build:
+      context: ./services/pipeline
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/pipeline:/app
+      - ./services/shared:/app/shared
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-msoa_user}:${POSTGRES_PASSWORD:-msoa_pass}@db:5432/${POSTGRES_DB:-msoa_db}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  llm:
+    container_name: llm
+    restart: always
+    build:
+      context: ./services/llm
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/llm:/app
+      - ./services/shared:/app/shared
+      - ${GOOGLE_APPLICATION_CREDENTIALS}:/app/credentials.json # Mount the key file
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-msoa_user}:${POSTGRES_PASSWORD:-msoa_pass}@db:5432/${POSTGRES_DB:-msoa_db}
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
+    depends_on:
+      db:
+        condition: service_healthy
+
+  executor:
+    container_name: executor
+    restart: always
+    build:
+      context: ./services/executor
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/executor:/app
+      - ./services/shared:/app/shared
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-msoa_user}:${POSTGRES_PASSWORD:-msoa_pass}@db:5432/${POSTGRES_DB:-msoa_db}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  ui-backend:
+    container_name: ui-backend
+    restart: always
+    build:
+      context: ./services/ui/backend
+      dockerfile: Dockerfile
+    expose:
+      - "8088"
+    volumes:
+      - ./services/ui/backend:/app
+      - ./services/shared:/app/shared
+      - ./docs:/app/docs # Mount docs for RAG
+      - ${GOOGLE_APPLICATION_CREDENTIALS}:/app/credentials.json # Mount GCP creds
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-msoa_user}:${POSTGRES_PASSWORD:-msoa_pass}@db:5432/${POSTGRES_DB:-msoa_db}
+      - GEMINI_MODEL=${GEMINI_MODEL}
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - AUTH_TOKEN_SECRET=${AUTH_TOKEN_SECRET:-}
+      - AUTH_TOKEN_TTL_SECONDS=${AUTH_TOKEN_TTL_SECONDS:-86400}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default
+      - shared_proxy
+
+  ui-frontend:
+    container_name: ui-frontend
+    restart: always
+    build:
+      context: ./services/ui/frontend
+      dockerfile: Dockerfile
+    expose:
+      - "5173"
+    volumes:
+      - ./services/ui/frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-/api}
+    depends_on:
+      - ui-backend
+    networks:
+      - default
+      - shared_proxy
+
+volumes:
+  msoa_postgres_data:
+
+networks:
+  shared_proxy:
+    external: true

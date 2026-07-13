@@ -1,0 +1,9 @@
+fastapi
+google-cloud-aiplatform
+psycopg2-binary
+pydantic
+requests
+schedule
+sqlalchemy
+uvicorn
+alembic

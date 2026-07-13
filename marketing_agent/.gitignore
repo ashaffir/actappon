@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+
+.venv/
+node_modules/
+dist/
+
+__pycache__/
+*.py[cod]
+
+services/ui/frontend/node_modules/
+services/ui/frontend/dist/
+
+credentials.json
+**/credentials.json

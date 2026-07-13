@@ -1,0 +1,399 @@
+SYSTEM NAME
+ATI Market Signal & Outreach Assistant (MSOA)
+
+MISSION
+Identify high-signal production pain in “agentic / orchestration / LLM workflows”, generate non-intrusive technical engagement drafts, and route everything through a human approval gate.
+
+PRIMARY CONSTRAINTS
+- Must remain non-spammy and professional.
+- Must be ToS-compliant (especially LinkedIn).
+- No autonomous DMs; no autonomous posting. Human approval required for all external actions.
+- Optimize for “right people notice” (AI platform/infra engineers), not impressions.
+
+TARGET ICP SIGNALS
+- Mentions of: prod/production, p99, latency, retries, timeouts, cost spikes, throttling, rollbacks, incidents, SLO, saturation, contention, concurrency, queueing.
+- Roles: platform engineer, infra, performance, SRE, ML platform, applied AI systems.
+- Platforms: agent frameworks, orchestration, tool-calling pipelines, OTEL tracing.
+
+OUTPUTS
+- Daily queue of “Engagement Opportunities” (ranked)
+- Draft responses (GitHub comment, PR review note, LinkedIn comment, blog outline)
+- Weekly signal report (top failure modes + top repos/topics + engagement outcomes)
+
+SYSTEM BOUNDARY
+MSOA does NOT run campaigns. It runs a repeatable workflow:
+Discover -> Qualify -> Strategize -> Draft -> Approve -> Execute -> Learn
+
+DEPLOYMENT MODEL (GCP)
+Goal: cheap, low-ops, human-in-the-loop.
+
+Recommended services:
+1) Cloud Run (stateless services)
+2) Cloud Scheduler (periodic runs)
+3) Pub/Sub (queue between steps)
+4) Firestore (or Cloud SQL Postgres) for persistent state
+5) Cloud Storage (archive raw fetched items)
+6) Secret Manager (tokens/keys)
+7) Cloud Logging (capped)
+
+HIGH-LEVEL COMPONENTS
+A) Ingestion Workers (read-only data collectors)
+B) Analysis & Scoring Workers (LLM + heuristics)
+C) Draft Generator (LLM)
+D) Approval UI (simple web UI + email/slack notifications)
+E) Executor (posts ONLY approved actions)
+F) Audit & Metrics (store every action + reason + outcome)
+
+SERVICE TOPOLOGY (Cloud Run)
+- service: msoa-harvester (cron-triggered)
+- service: msoa-qualifier (pubsub-triggered)
+- service: msoa-strategist (pubsub-triggered)
+- service: msoa-composer (pubsub-triggered)
+- service: msoa-executor (manual-triggered or pubsub-triggered only for APPROVED)
+- service: msoa-ui (web app for review/approve)
+
+SCHEDULING
+- Cloud Scheduler triggers harvesters on a schedule:
+  - GitHub: every 6 hours
+  - Medium/blog/RSS: daily
+  - LinkedIn: NO automated scraping; only via approved input channels (see LinkedIn section)
+
+DATA STORES
+- Firestore (recommended for speed): collections
+  - sources/
+  - candidates/
+  - opportunities/
+  - drafts/
+  - actions/
+  - outcomes/
+- Cloud Storage: raw html/json snapshots for audit/debug
+
+SECRETS
+- GitHub token, optional GitHub App credentials
+- (Optional) OpenAI/Anthropic API keys for LLM
+- Email provider webhook or Slack webhook (for notifications)
+Stored in Secret Manager, mounted as env vars in Cloud Run.
+
+OBSERVABILITY
+- Track: counts per stage, approval rate, reply rate, false positives, blocked actions.
+- Export minimal metrics to Cloud Monitoring (optional).
+
+NUMBER OF AGENTS
+Recommended: 1 agent.
+
+CODE: GitHub Harvester
+- Pulls issues/PRs via GitHub Search API or GH CLI equivalent logic.
+- Stores raw items in candidates/.
+
+CODE: Content/RSS Harvester
+- Pulls RSS feeds (Medium tags, engineering blogs, HN RSS if used).
+- Stores in candidates/.
+
+AGENT: Signal Qualifier/Classifier
+- LLM + heuristic scoring.
+- Outputs: signal_strength, failure_mode, ICP match, confidence, discard flag.
+
+CODE: Channel Strategist
+- Chooses engagement type:
+  - GitHub comment vs PR note vs ignore
+  - LinkedIn comment vs ignore (only from approved sources)
+  - Blog outline suggestion (when trend repeats)
+- Enforces “no DM first”.
+
+AGENT: Message Composer
+- Produces 2–3 variants, engineering tone, no pitch.
+- Attaches “evidence pointers” (links to your synthetic scenario or docs) ONLY when appropriate.
+
+AGENT: Compliance & Risk Scorer (Guardrails)
+- Flags spam risk, ToS risk, reputational risk.
+- Hard blocks:
+  - repeated commenting on same person/repo too frequently
+  - generic templated responses
+  - any sales CTA
+  - any autonomous DM suggestion
+
+MODULE: Human Approval Gate
+- Not an agent. Mandatory step.
+- Only approved drafts can be executed.
+
+OPTIONAL AGENT 7 (later): Outcome Learner
+- Tracks replies, sentiment, conversions (manual tags).
+- Adjusts scoring thresholds and channel preference.
+
+LLM ROLE
+Use LLMs for:
+- classification (is this production pain?)
+- summarization (what is the issue?)
+- drafting (technical response variants)
+- risk detection (is this spammy?)
+
+DO NOT use LLMs for:
+- autonomous outreach decisions without guardrails
+- generating bulk content
+
+MODEL STRATEGY
+- One primary model (Gemini 2.0 Pro) for qualifier + composer.
+- One smaller/cheaper model (optional) for first-pass summarization.
+- Temperature low (0.1–0.4) for consistency.
+
+PROMPTING PATTERN
+- Structured outputs (JSON) for scoring agents.
+- Separate prompts per stage to avoid cross-contamination.
+- “Do not pitch” enforced in every drafting prompt.
+
+DATA MINIMIZATION
+- Store only excerpts + metadata by default.
+- Avoid storing personal data from LinkedIn beyond public post URL + snippet.
+
+GITHUB: ACCESS METHODS (choose one)
+
+GitHub REST API + Search endpoints
+- Use a GitHub Fine-grained PAT or GitHub App.
+- Benefits: stable, ToS-friendly, works in Cloud Run.
+- Rate limits apply; store ETags and avoid refetch.
+
+DATA TO COLLECT (GitHub)
+- Issues:
+  - repo, issue number, title, body snippet, labels, author, created_at, updated_at, comments count
+- PRs:
+  - repo, PR number, title, body snippet, files changed count (optional), review comments count
+
+SEARCH QUERIES (examples, defaults set in code, but configured with the UI settings)
+For each target repo:
+- is:issue (latency OR slow OR timeout OR retry OR stuck OR "rate limit") in:title,body sort:updated-desc
+- is:pr (otel OR opentelemetry OR tracing OR observability) in:title,body sort:updated-desc
+
+INITIAL TARGET REPOS (configured with the UI settings)
+- langchain-ai/langchain
+- crewAIInc/crewAI
+- microsoft/autogen
+- run-llama/llama_index
+- Significant-Gravitas/AutoGPT
+(plus any orchestration/infra repos your ICP uses)
+
+EXECUTION RULES
+- Harvest every 6 hours.
+- Only consider items updated within last 30–60 days.
+- Only create an “opportunity” if signal_strength >= threshold (e.g., 0.75) and risk_score low.
+
+ENGAGEMENT FORMAT RULE
+GitHub comments must:
+- address the specific technical symptom
+- offer a plausible diagnosis path
+- avoid linking ATI unless the user asks or it’s truly relevant
+- never ask for a call in-thread
+
+LINKEDIN CONSTRAINT
+Do NOT automate LinkedIn scraping or posting via bots.
+It is fragile and ToS-risky. Use compliant workflows.
+
+COMPLIANT INPUT OPTIONS (choose 1–2)
+A) Manual “Saved Search” + notifications
+- You (human) do the search in LinkedIn UI
+- You paste selected post URLs into MSOA (UI has “Add LinkedIn URL”)
+- MSOA processes ONLY those URLs (no crawling beyond what you provide)
+
+B) Google Alerts / X-ray Search
+- Use Google alerts with site:linkedin.com/posts queries
+- Alerts arrive to email/RSS
+- MSOA ingests the alert feed (RSS/email-forward) as candidates
+
+C) Curated list monitoring
+- You maintain a list of target profiles (AI platform/infra leaders)
+- You manually add interesting posts to MSOA
+
+LINKEDIN OUTPUT POLICY
+- MSOA drafts only “comment” text.
+- Execution is manual:
+  - Copy/paste from MSOA UI into LinkedIn.
+(Do not auto-post.)
+
+WHY THIS STILL WORKS
+LinkedIn is a reputation channel. Low-volume, high-quality comments are enough.
+The system’s job is to find the needles and draft excellent replies, not to automate posting.
+
+CHANNEL PRIORITY (v1)
+1) GitHub issues/PRs (highest signal)
+2) Engineering blog posts (your site / Medium syndication)
+3) LinkedIn comments (manual execution)
+4) Hacker News / Reddit (optional, low priority)
+
+POSTING / ENGAGEMENT RULES
+- Max 1–2 engagements per day total across all channels.
+- Never engage the same author more than once per 14 days.
+- Never engage the same repo/thread more than once per 7 days unless there is a direct reply.
+- Avoid links unless asked. If included:
+  - link to a specific technical example (synthetic scenario, OTEL snippet)
+  - not homepage
+- Never pitch pricing.
+- Never say “book a call” publicly.
+- If someone asks “how?”, then you can offer a short CTA privately.
+
+UI GOAL
+Text-first approval + logging. No charts required.
+
+TECH CHOICE (GCP-friendly)
+- Cloud Run service with a minimal web UI
+- Auth via Google Identity-Aware Proxy (IAP) or basic OAuth
+- Single-user is fine (you)
+
+PAGES
+
+1) Inbox (Opportunities)
+- List items:
+  - source icon (GitHub/LinkedIn/RSS)
+  - title
+  - signal_strength
+  - failure_mode label
+  - risk score
+  - recommended action
+  - age (updated_at)
+- Filters:
+  - channel
+  - repo/framework
+  - failure_mode
+  - score range
+
+2) Opportunity Detail
+- Source link
+- Highlighted excerpt
+- LLM analysis:
+  - “why relevant”
+  - “what failure mode”
+  - “who is likely audience”
+- Recommended action + constraints
+- Drafts:
+  - Variant A/B/C (tabs)
+- Buttons:
+  - Approve (creates Action)
+  - Edit (inline editor)
+  - Reject (reason required)
+
+3) Actions Log
+- Approved actions + status:
+  - pending/manual
+  - executed
+  - archived
+- Outcome tag:
+  - replied?
+  - positive?
+  - requested link?
+  - became pilot?
+
+4) Weekly Digest
+- Top themes
+- “Where we should focus next week”
+- List of best-performing replies (for reuse patterns)
+
+5) Settings
+- LLM model
+- Signal strength threshold
+- Risk score threshold
+- Notification settings
+- search queries
+- target repos
+
+
+NOTIFICATIONS
+- Daily email: “You have N high-signal items”
+- Optional Slack: same summary
+
+
+PHASE 1: GitHub-only, fully functional loop
+- Implement:
+  - harvester -> qualifier -> composer -> UI approval -> manual execute
+- No executor automation yet.
+- Goal: 10 high-quality drafts/week.
+
+PHASE 2: Add RSS/Medium/blog harvesting
+- Add RSS harvester
+- Add weekly digest
+
+PHASE 3: LinkedIn manual-assisted workflow
+- Add “Paste LinkedIn URL” intake
+- Add comment drafts
+- Still manual posting
+
+PHASE 4: Limited executor automation for GitHub only
+- Auto-comment ONLY after approval
+- Use GitHub token to post approved comment
+- Keep strict rate limits
+
+PHASE 5: Outcome learning
+- Tag outcomes
+- Adjust scoring thresholds
+- Build “best reply patterns” library
+
+PROMPT: Signal Qualifier (JSON Output)
+Input: {title, body_excerpt, labels, repo, source}
+Task: Decide if this indicates production pain relevant to coordination/agentic workflows.
+Return JSON:
+{
+  "signal_strength": 0.0-1.0,
+  "icp_match": 0.0-1.0,
+  "failure_mode": "fanout|blocking|retry|latency|unknown",
+  "why_relevant": "max 2 sentences",
+  "recommended_action": "comment|ignore",
+  "risk_flags": ["spam_risk_low|med|high", "uncertain_context", ...]
+}
+Hard rules:
+- If unclear whether prod: lower score.
+- If tutorial/student: discard.
+- Never mention ATI.
+
+PROMPT: Channel Strategist
+Given qualified item JSON, choose channel action and constraints.
+Return JSON:
+{
+  "channel": "github_comment|pr_note|linkedin_comment|ignore",
+  "tone": "diagnostic|clarifying|validating",
+  "link_policy": "none|only_if_asked|one_specific_example",
+  "dm_policy": "never_first"
+}
+
+PROMPT: Message Composer
+Draft 3 variants, each <= 120 words.
+Constraints:
+- Engineering tone, no marketing
+- No CTA
+- No product mention
+- Provide practical diagnostic suggestion
+Output:
+{
+  "variant_a": "...",
+  "variant_b": "...",
+  "variant_c": "..."
+}
+
+PROMPT: Risk/Compliance
+Given draft + context, score spam risk and ToS risk.
+Return JSON:
+{
+  "spam_risk": "low|med|high",
+  "tos_risk": "low|med|high",
+  "block": true|false,
+  "edit_suggestions": ["..."]
+}
+
+DATA FLOW (Explicit)
+[Raw Candidate]
+  ↓
+collector-service
+  ↓
+[Normalized Candidate]
+  ↓
+pipeline-service
+  ↓
+[Qualified Candidate]
+  ↓
+llm-service
+  ↓
+[Draft Opportunity]
+  ↓
+review-ui
+  ↓ (approve)
+[Approved Action]
+  ↓
+executor-service
+  ↓
+[Posted Comment]

@@ -1,0 +1,61 @@
+PRODUCT:
+Internal assistant for founder-led market penetration.
+
+PRIMARY USER:
+Founder / technical operator of ATI.
+
+SECONDARY USERS:
+None (single-user system by design).
+
+---
+
+USER GOALS:
+- Find the *right* people (infra / AI platform engineers)
+- Engage only when there is real pain
+- Sound technical, calm, and credible
+- Avoid marketing tone entirely
+- Maintain personal voice while scaling attention
+
+---
+
+USER EXPERIENCE (DAILY FLOW):
+
+1. User opens the system (CLI or simple web UI)
+2. Sees a queue of “High-Signal Opportunities”
+3. Clicks one item
+4. Sees:
+   - Source (GitHub issue, LinkedIn post, etc.)
+   - Why it is relevant
+   - Risk score (spam / irrelevance)
+   - Recommended channel action
+   - 2–3 drafted response variants
+5. User:
+   - Approves
+   - Edits
+   - Rejects
+6. System logs outcome and applies cooldown rules
+
+---
+
+WEEKLY FLOW:
+
+- Weekly digest:
+  - Top recurring failure modes observed
+  - Which frameworks show most pain
+  - Which messages got responses
+
+---
+
+UX CONSTRAINTS:
+- No dashboards full of charts
+- Text-first
+- Bias toward review and judgment
+- Everything skimmable in <5 minutes
+
+---
+
+OUT OF SCOPE (v1):
+- CRM
+- Analytics attribution
+- Automated scheduling
+- Multi-user roles

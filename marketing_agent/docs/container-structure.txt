@@ -1,0 +1,66 @@
+docker-compose/
+├── collector-service
+│   ├── fetch_github
+│   ├── fetch_rss
+│   └── ingest_manual_urls
+│
+├── pipeline-service
+│   ├── heuristic_scoring
+│   ├── dedupe
+│   ├── cooldown_enforcer
+│   └── queue_manager
+│
+├── llm-service
+│   ├── analyze_and_compose (single prompt)
+│   └── json_validation
+│
+├── review-ui
+│   ├── inbox_view
+│   ├── detail_view
+│   └── approval_actions
+│
+├── executor-service
+│   ├── github_comment_poster
+│   └── rate_limiter
+│
+└── shared
+    ├── config
+    ├── auth
+    └── logging
+
+
+DATA STORE (one DB is enough)
+
+collections / tables:
+
+- candidates
+  - id
+  - source
+  - url
+  - raw_excerpt
+  - fetched_at
+
+- opportunities
+  - id
+  - candidate_id
+  - signal_strength
+  - failure_mode
+  - recommended_action
+  - risk_flags
+  - status (pending / approved / rejected)
+
+- drafts
+  - opportunity_id
+  - variant_a
+  - variant_b
+  - edited_version
+
+- actions
+  - opportunity_id
+  - channel
+  - executed_at
+  - outcome (replied / ignored / unknown)
+
+- cooldowns
+  - repo_or_user
+  - last_engaged_at

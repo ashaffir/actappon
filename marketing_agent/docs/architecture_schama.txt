@@ -1,0 +1,71 @@
+┌──────────────────────────┐
+│   External Sources       │
+│                          │
+│  - GitHub API            │
+│  - RSS / Blogs           │
+│  - (Manual) LinkedIn URL │
+└───────────┬──────────────┘
+            │
+            ▼
+┌──────────────────────────┐
+│  collector-service       │  (Docker)
+│                          │
+│  - GitHub search         │
+│  - RSS fetch             │
+│  - Manual URL ingest     │
+│  - Deduplication         │
+└───────────┬──────────────┘
+            │
+            ▼
+┌──────────────────────────┐
+│  pipeline-service        │  (Docker)
+│                          │
+│  Deterministic logic:    │
+│  - Keyword scoring       │
+│  - Repo allowlist        │
+│  - Recency checks        │
+│  - Cooldown rules        │
+│  - Priority queueing     │
+└───────────┬──────────────┘
+            │
+            ▼
+┌──────────────────────────┐
+│  llm-service             │  (Docker)
+│                          │
+│  Single LLM call per     │
+│  candidate:              │
+│  - ICP fit               │
+│  - Failure mode          │
+│  - Action recommendation │
+│  - Draft A / B           │
+│  - Risk flags            │
+└───────────┬──────────────┘
+            │
+            ▼
+┌──────────────────────────┐
+│  review-ui               │  (Docker)
+│                          │
+│  - Inbox (opportunities) │
+│  - View analysis         │
+│  - Edit / approve        │
+│  - Reject + reason       │
+└───────────┬──────────────┘
+            │ (approved only)
+            ▼
+┌──────────────────────────┐
+│  executor-service        │  (Docker)
+│                          │
+│  - GitHub comment post   │
+│  - (Future) PR comments  │
+│  - Strict rate limits    │
+└───────────┬──────────────┘
+            │
+            ▼
+┌──────────────────────────┐
+│  persistence layer       │
+│                          │
+│  - Opportunities         │
+│  - Drafts                │
+│  - Actions               │
+│  - Outcomes              │
+└──────────────────────────┘

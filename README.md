@@ -9,6 +9,7 @@ Active services:
 - nginx
 - File Browser
 - Uptime Kuma monitor
+- MSOA marketing agent
 
 SSL is handled by Cloudflare, not by nginx/certbot.
 
@@ -24,6 +25,7 @@ SSL is handled by Cloudflare, not by nginx/certbot.
 ├── backups
 ├── docker-compose.yml
 ├── filebrowser
+├── marketing_agent
 ├── monitor
 └── nginx
     ├── default.conf
@@ -39,7 +41,7 @@ port 80, and Cloudflare proxies HTTPS traffic to the origin over HTTP.
 
 Recommended Cloudflare settings:
 
-- DNS records for `actappon.com`, `filebrowser.actappon.com`, and `monitor.actappon.com` should be proxied.
+- DNS records for `actappon.com`, `filebrowser.actappon.com`, `monitor.actappon.com`, and `msoa.actappon.com` should be proxied.
 - The `www.actappon.com` DNS record should also point to the same server if it is used.
 - SSL/TLS mode should be `Flexible` for this HTTP-only origin setup.
 - Enable "Always Use HTTPS" in Cloudflare if HTTP-to-HTTPS redirects are needed.
@@ -55,6 +57,7 @@ Required Cloudflare DNS records:
 | `www.actappon.com` | `A` | server public IP | Proxied |
 | `filebrowser.actappon.com` | `A` | server public IP | Proxied |
 | `monitor.actappon.com` | `A` | server public IP | Proxied |
+| `msoa.actappon.com` | `A` | server public IP | Proxied |
 
 To get the server public IP from the server:
 
@@ -81,8 +84,33 @@ The script:
 3. Ensures the local `backups/` directory exists.
 4. Starts WordPress and MySQL first.
 5. Starts File Browser and monitor.
-6. Starts the full stack, including nginx.
-7. Prints the Cloudflare and WordPress migration checklist.
+6. Starts the MSOA marketing agent stack.
+7. Starts the full stack, including nginx.
+8. Prints the Cloudflare and WordPress migration checklist.
+
+### MSOA marketing agent
+
+MSOA is exposed through the main nginx container:
+
+- UI: `https://msoa.actappon.com`
+- API: `https://msoa.actappon.com/api`
+
+The MSOA `ui-frontend` and `ui-backend` services join the external
+`shared_proxy` Docker network so the main nginx container can reach them.
+
+Before expecting the subdomain to work:
+
+1. Configure `marketing_agent/.env`.
+2. Make sure the Cloudflare `msoa.actappon.com` A record points to this server public IP.
+3. Keep the DNS record proxied / orange-clouded.
+4. Keep Cloudflare SSL/TLS mode as `Flexible`.
+
+To check MSOA setup details:
+
+```bash
+cd marketing_agent
+./run.sh setup
+```
 
 ### WordPress-only migration
 
@@ -145,6 +173,8 @@ docker ps
 docker logs --tail=50 nginx
 docker logs --tail=50 wordpress
 docker logs --tail=50 mysql
+docker logs --tail=50 ui-frontend
+docker logs --tail=50 ui-backend
 ```
 
 

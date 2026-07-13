@@ -1,0 +1,113 @@
+IOCANE — MARKETING DISTRIBUTION CHANNELS & COMMUNITIES
+Version: 1.0
+
+Purpose:
+This document lists social platforms, communities, forums, newsletters,
+and websites where iocane should maintain presence, monitor discussions,
+and distribute marketing, thought leadership, and product content.
+
+Focus:
+AI agents, platform engineering, SRE, DevOps, observability, reliability,
+and AI infrastructure.
+
+============================================================
+SOCIAL PLATFORMS
+============================================================
+
+X (Twitter)
+- Use for technical thought leadership and real-time commentary
+- Focus on outages, agent failures, infra lessons
+
+Hashtags:
+#AgenticAI #PlatformEngineering #SRE #DevOps #LLMOps #Observability #OpenTelemetry
+
+LinkedIn
+- Buyer-facing credibility
+- Long-form technical positioning
+- Founder-led content
+
+============================================================
+REDDIT
+============================================================
+
+High-priority subreddits:
+- r/devops
+- r/sre
+- r/platformengineering
+- r/MachineLearning
+- r/ArtificialIntelligence
+- r/LLMOps
+- r/Kubernetes
+- r/cloudcomputing
+
+============================================================
+SLACK & DISCORD
+============================================================
+
+Slack:
+- SRE Community Slack
+- Platform Engineering Slack
+- CNCF Slack
+- Kubernetes Slack
+- FinOps Foundation Slack
+
+Discord:
+- LangChain Discord
+- CrewAI / agent framework Discords
+- AI infrastructure-focused Discord servers
+
+============================================================
+NEWSLETTERS & MEDIA
+============================================================
+
+- The New Stack
+- InfoQ
+- SRE Weekly
+- DevOps Weekly
+- Platform Engineering Weekly
+- FinOps Weekly
+- TLDR AI
+- Import AI
+
+============================================================
+BLOGGING & CONTENT PLATFORMS
+============================================================
+
+- Medium (DevOps / AI infra publications)
+- Dev.to
+- Hashnode
+- Substack
+
+============================================================
+COMMUNITIES & FOUNDATIONS
+============================================================
+
+- CNCF
+- OpenTelemetry community
+- FinOps Foundation
+- Platform Engineering community
+- SREcon community
+
+============================================================
+CONFERENCES
+============================================================
+
+- SREcon
+- KubeCon + CloudNativeCon
+- DevOpsDays
+- PlatformCon
+- FinOps X
+- AI Infrastructure Summits
+
+============================================================
+DIRECT & VIRAL CHANNELS
+============================================================
+
+- GitHub (issues, discussions, PRs)
+- Hacker News (Show HN, discussions)
+- Email newsletter
+- Product Hunt (later-stage launch)
+
+============================================================
+END OF DOCUMENT
+============================================================

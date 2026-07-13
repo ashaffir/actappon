@@ -1,0 +1,228 @@
+IOCANE — COMPANY POSITIONING & MARKETING RAG SOURCE
+Version: 1.0
+
+This document defines iocane’s company-level positioning, product definitions,
+target buyers, messaging boundaries, and narrative guidelines.
+It is intended as a grounding source for marketing, content generation,
+sales enablement, and outbound messaging systems.
+
+================================================================
+COMPANY DEFINITION
+================================================================
+
+Company Name: iocane
+
+Short Definition:
+iocane is the reliability platform for agentic systems.
+
+Extended Definition:
+iocane builds reliability infrastructure for AI agent architectures,
+helping teams observe, explain, and prevent coordination failures
+before and during production.
+
+iocane focuses specifically on agent-native failure modes
+that emerge from multi-agent coordination, not generic application monitoring.
+
+================================================================
+CORE PROBLEM IOCANE SOLVES
+================================================================
+
+Modern AI systems are increasingly agentic:
+- multi-step
+- concurrent
+- tool-calling
+- stateful
+- distributed across models and services
+
+These systems fail in ways traditional observability, APM,
+and AIOps tools do not understand.
+
+Common agentic failure modes include:
+- fan-out collapse
+- retry storms
+- token starvation
+- queue/backpressure cascades
+- tool-call contention and rate-limit amplification
+- tail-latency explosions due to coordination bottlenecks
+
+These failures:
+- are hard to diagnose
+- are often triggered by seemingly “safe” changes
+- lead to outages, degraded UX, and runaway cost
+
+iocane exists to make agentic systems safe to scale.
+
+================================================================
+PRODUCT SUITE OVERVIEW
+================================================================
+
+iocane is a multi-product company focused on agentic reliability.
+
+------------------------------------------------
+1. iocane-ATI (Agent Telemetry & Intelligence)
+------------------------------------------------
+
+Purpose:
+Runtime observability and diagnostics for agentic systems.
+
+Primary Question Answered:
+“What is breaking in my agent system right now — and why?”
+
+Core Capabilities:
+- agent-native OpenTelemetry instrumentation
+- detection of coordination pathologies
+- explainable failure diagnostics
+- actionable mitigation guidance
+- policy hooks for runtime safeguards
+
+iocane-ATI operates during production and incidents.
+
+------------------------------------------------
+2. iocane-CIA (Change Impact Analyzer)
+------------------------------------------------
+
+Purpose:
+Pre-change and rollout-time impact analysis for agentic systems.
+
+Primary Question Answered:
+“If I change this agent system, what will break — and how do I prevent it?”
+
+Core Capabilities:
+- analyzes proposed agent graph, policy, and runtime changes
+- predicts coordination failure risks before deployment
+- forecasts which agentic failure detectors are likely to trigger
+- estimates impact on latency, failure rate, and cost
+- produces rollout and mitigation recommendations
+
+iocane-CIA operates before and during change events.
+
+------------------------------------------------
+Relationship Between Products
+------------------------------------------------
+
+iocane-ATI + iocane-CIA together cover the full reliability lifecycle:
+
+- Before change: predict and prevent failures (CIA)
+- During runtime: detect and explain failures (ATI)
+
+Both products share:
+- agent-native semantics
+- the same buyer persona
+- the same failure taxonomy
+- the same reliability narrative
+
+================================================================
+TARGET BUYERS & USERS
+================================================================
+
+Primary Buyers:
+- AI platform teams
+- infrastructure / SRE teams supporting agentic workloads
+- platform engineering teams responsible for AI reliability
+
+Secondary Influencers:
+- CTO / VP Engineering (reliability, scale, cost control)
+- FinOps (cost amplification from agent failures)
+- Security / Compliance (controlled rollouts, predictability)
+
+iocane is NOT targeted at:
+- generic SMB IT teams
+- traditional IT change management users
+- non-agentic application stacks
+
+================================================================
+POSITIONING BOUNDARIES (WHAT IOCANE IS / IS NOT)
+================================================================
+
+iocane IS:
+- agent-native
+- reliability-focused
+- coordination-aware
+- explainable and evidence-driven
+- built for modern AI agent architectures
+
+iocane IS NOT:
+- generic APM
+- generic AIOps
+- ITSM / CAB tooling
+- model accuracy monitoring
+- a general DevOps platform
+
+These boundaries are intentional and should be preserved
+in all marketing and sales messaging.
+
+================================================================
+CATEGORY NARRATIVE
+================================================================
+
+iocane operates in the category of:
+
+“Agentic Reliability Infrastructure”
+
+This category focuses on:
+- reliability of agent coordination
+- safety of concurrent AI systems
+- prevention of emergent failure modes
+- confidence in scaling agent architectures
+
+iocane should be positioned as a category leader,
+not as a feature within observability or AIOps.
+
+================================================================
+CORE VALUE PROPOSITIONS
+================================================================
+
+For Engineers / SREs:
+- Fewer incidents caused by agent coordination failures
+- Faster diagnosis when issues occur
+- Confidence when shipping changes
+- Reduced on-call stress and firefighting
+
+For Organizations:
+- Higher uptime for AI-powered products
+- Controlled AI infrastructure costs
+- Safer scaling of agent-based systems
+- Reduced operational risk from AI complexity
+
+================================================================
+KEY MESSAGING PRINCIPLES
+================================================================
+
+Messaging should:
+- Lead with agent-specific failure modes
+- Emphasize prevention, not just detection
+- Be concrete and technical, not buzzword-heavy
+- Highlight explainability and evidence
+- Speak to reliability, safety, and confidence
+
+Avoid:
+- Over-generalizing to “all AI systems”
+- Competing head-on with generic APM/AIOps vendors
+- Claiming full automation or “zero incidents”
+- Vague promises without technical grounding
+
+================================================================
+CANONICAL ONE-LINERS (APPROVED)
+================================================================
+
+- “iocane is the reliability platform for agentic systems.”
+- “iocane helps teams safely scale AI agents by preventing coordination failures.”
+- “iocane detects, explains, and prevents agentic failures before and during production.”
+- “Ship agent changes with confidence.”
+
+================================================================
+GO-TO-MARKET PHILOSOPHY
+================================================================
+
+iocane should grow via:
+- deep credibility with technical buyers
+- strong technical content and thought leadership
+- bottom-up adoption within platform teams
+- expansion from observability into prevention
+
+The long-term vision is not breadth,
+but authority in agentic reliability.
+
+================================================================
+END OF DOCUMENT
+================================================================
